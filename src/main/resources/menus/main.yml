@@ -1,0 +1,14 @@
+menu:
+  id: main
+  title: "Menu Principal"
+  rows: 6
+
+items:
+  loja:
+    slot: 13
+    name: "Loja"
+    icon: sword  # Ajuste para um item válido do Hytale
+    actions:
+      - open_menu: loja
+    conditions:
+      - permission: chestcommands.loja

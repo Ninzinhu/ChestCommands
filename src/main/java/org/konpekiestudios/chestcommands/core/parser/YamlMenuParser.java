@@ -58,7 +58,22 @@ public class YamlMenuParser implements MenuParser {
 
                 // Parse conditions similarly
                 List<Condition> conditions = new ArrayList<>();
-                // Implement if needed
+                List<Map<String, Object>> conditionsData = (List<Map<String, Object>>) itemData.get("conditions");
+                if (conditionsData != null) {
+                    for (Map<String, Object> conditionData : conditionsData) {
+                        for (Map.Entry<String, Object> conditionEntry : conditionData.entrySet()) {
+                            String conditionType = conditionEntry.getKey();
+                            String value = (String) conditionEntry.getValue();
+                            Condition condition = ConditionRegistry.create(conditionType, new ActionContext() {
+                                @Override
+                                public org.konpekiestudios.chestcommands.api.PlayerRef getPlayer() { return null; }
+                                @Override
+                                public String getValue() { return value; }
+                            });
+                            if (condition != null) conditions.add(condition);
+                        }
+                    }
+                }
                 item.setConditions(conditions);
             }
         }

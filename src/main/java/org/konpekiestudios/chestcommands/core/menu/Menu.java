@@ -1,6 +1,7 @@
 package org.konpekiestudios.chestcommands.core.menu;
 
 import java.util.Map;
+import org.konpekiestudios.chestcommands.core.menu.MenuItem;
 
 public class Menu {
     private String id;

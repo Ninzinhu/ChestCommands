@@ -5,9 +5,6 @@ import org.konpekiestudios.chestcommands.core.parser.MenuParser;
 import org.konpekiestudios.chestcommands.core.parser.YamlMenuParser;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,12 +17,18 @@ public class MenuLoader {
             return loadedMenus.get(menuId);
         }
         try {
-            Path path = Paths.get("plugins/ChestCommands/menus/" + menuId + ".yml"); // Adjust path
-            String content = Files.readString(path);
+            // Use class loader to load from resources
+            String resourcePath = "menus/" + menuId + ".yml";
+            var inputStream = getClass().getClassLoader().getResourceAsStream(resourcePath);
+            if (inputStream == null) {
+                System.err.println("Menu file not found: " + resourcePath);
+                return null;
+            }
+            String content = new String(inputStream.readAllBytes());
             Menu menu = parser.parse(content);
             loadedMenus.put(menuId, menu);
             return menu;
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }

@@ -2,11 +2,8 @@ package org.konpekiestudios.chestcommands.hytale;
 
 import org.konpekiestudios.chestcommands.core.action.ActionRegistry;
 import org.konpekiestudios.chestcommands.core.action.OpenMenuAction;
-import org.konpekiestudios.chestcommands.core.action.RunCommandAction;
-import org.konpekiestudios.chestcommands.core.action.CloseMenuAction;
 import org.konpekiestudios.chestcommands.core.action.GiveItemAction;
 import org.konpekiestudios.chestcommands.core.condition.ConditionRegistry;
-import org.konpekiestudios.chestcommands.core.condition.HasPermissionCondition;
 import org.konpekiestudios.chestcommands.core.service.MenuService;
 import org.konpekiestudios.chestcommands.core.service.MenuLoader;
 import org.konpekiestudios.chestcommands.core.menu.Menu;
@@ -37,8 +34,6 @@ public class ChestCommandsPlugin implements ChestCommandsAPI { // implements Plu
         menuLoader = new MenuLoader();
         // Registrar ações e condições padrão
         ActionRegistry.register("open_menu", ctx -> new OpenMenuAction(ctx.getValue()));
-        ActionRegistry.register("run_command", ctx -> new RunCommandAction(ctx.getValue()));
-        ActionRegistry.register("close_menu", ctx -> new CloseMenuAction());
         ActionRegistry.register("give_item", ctx -> {
             String[] parts = ctx.getValue().split(":");
             return new GiveItemAction(parts[0], Integer.parseInt(parts[1]));
