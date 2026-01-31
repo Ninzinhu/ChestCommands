@@ -1,0 +1,8 @@
+{
+  "name": "ChestCommands",
+  "version": "1.0.0",
+  "main": "org.konpekiestudios.chestcommands.hytale.ChestCommandsPlugin",
+  "description": "Plugin de menus configuráveis para Hytale, inspirado no Chest Commands",
+  "authors": ["Konpeki Studios"],
+  "dependencies": []
+}
