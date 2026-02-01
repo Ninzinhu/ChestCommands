@@ -9,7 +9,6 @@ public interface CommandHandler {
      * Handle a command invocation.
      * @param sender engine-specific sender object (player or console)
      * @param args command arguments
-     * @return true if handled successfully
      */
-    boolean handle(Object sender, String[] args);
+    void handle(Object sender, String[] args);
 }

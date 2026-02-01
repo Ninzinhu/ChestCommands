@@ -72,14 +72,6 @@ public class HytaleMenuRenderer {
 
                 if (windowInstance == null) continue;
 
-                // try to set items if method exists
-                try {
-                    Method setItem = windowClass.getMethod("setItem", int.class, Object.class);
-                    // leave empty for now
-                } catch (NoSuchMethodException ignored) {
-                    // ok
-                }
-
                 // try player open method variants
                 String[] openNames = new String[]{"openUI", "openWindow", "openInventory", "openContainer", "showWindow"};
                 boolean opened = false;

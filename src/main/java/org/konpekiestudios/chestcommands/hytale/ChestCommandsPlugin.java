@@ -1,26 +1,17 @@
 package org.konpekiestudios.chestcommands.hytale;
 
-import org.konpekiestudios.chestcommands.core.service.MenuService;
-import org.konpekiestudios.chestcommands.core.service.MenuLoader;
-import org.konpekiestudios.chestcommands.core.parser.MenuParser;
-import org.konpekiestudios.chestcommands.api.ChestCommandsAPI;
-import org.konpekiestudios.chestcommands.api.CommandDispatcher;
-import org.konpekiestudios.chestcommands.registrar.ConfigMenusRegistrar;
-import org.konpekiestudios.chestcommands.config.PluginMenuConfig;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.konpekiestudios.chestcommands.api.CommandDispatcher;
 
 public class ChestCommandsPlugin {
     // Use Object for runtime-only types (Hytale classes) to avoid compile-time linkage
     private final Logger logger = Logger.getLogger("ChestCommands");
-    private MenuService menuService;
     private CommandDispatcher commandDispatcher;
     private File configDir;
 
@@ -35,13 +26,11 @@ public class ChestCommandsPlugin {
         ensureConfigFolder();
 
         // init core services (MenuLoader etc.)
-        this.menuService = new MenuService();
         this.commandDispatcher = new ReflectiveCommandDispatcher();
 
         // load menus from config folder
-        try {
-            Path dir = configDir.toPath();
-            Files.list(dir).filter(p -> p.toString().endsWith(".yml")).forEach(p -> {
+        try (var stream = Files.list(configDir.toPath())) {
+            stream.filter(p -> p.toString().endsWith(".yml")).forEach(p -> {
                 try (InputStream is = new FileInputStream(p.toFile())) {
                     Map<String, Object> parsed = new org.yaml.snakeyaml.Yaml().load(is);
                     // For now just log file load
@@ -50,8 +39,8 @@ public class ChestCommandsPlugin {
                     Object cmd = parsed != null ? parsed.get("command") : null;
                     if (cmd instanceof String) {
                         String command = ((String) cmd).trim();
-                        command = command.startsWith("/") ? command.substring(1) : command;
-                        ((ReflectiveCommandDispatcher) this.commandDispatcher).register(command, (player, args) -> {
+                        String finalCommand = command.startsWith("/") ? command.substring(1) : command;
+                        ((ReflectiveCommandDispatcher) this.commandDispatcher).register(finalCommand, (player, args) -> {
                             // open a test empty menu for now
                             try {
                                 HytaleMenuRenderer renderer = new HytaleMenuRenderer();
@@ -59,10 +48,11 @@ public class ChestCommandsPlugin {
                                 // send chat confirmation
                                 sendChatToPlayer(player, "Opened menu from config: " + p.getFileName());
                             } catch (Exception e) {
-                                logger.log(Level.SEVERE, "Failed to open menu for command " + command, e);
+                                logger.log(Level.SEVERE, "Failed to open menu for command " + finalCommand, e);
+                                throw e; // rethrow to let dispatcher handle
                             }
                         });
-                        logger.info("[ChestCommands] Registered command from config: /" + command);
+                        logger.info("[ChestCommands] Registered command from config: /" + finalCommand);
                     }
                 } catch (Exception ex) {
                     logger.log(Level.SEVERE, "Failed to read menu file " + p.toString(), ex);
@@ -79,6 +69,7 @@ public class ChestCommandsPlugin {
                 sendChatToPlayer(player, "Opened test chest UI");
             } catch (Exception e) {
                 logger.log(Level.SEVERE, "Failed to open test chest UI", e);
+                throw e;
             }
         });
 
