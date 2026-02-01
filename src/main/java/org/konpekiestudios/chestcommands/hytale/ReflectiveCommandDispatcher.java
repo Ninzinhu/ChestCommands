@@ -99,11 +99,11 @@ public class ReflectiveCommandDispatcher implements CommandDispatcher {
             if (serverInstance != null) {
                 Object commandManager = null;
                 try {
-                    Method getCm = serverInstance.getClass().getMethod("getCommandManager");
+                    Method getCm = serverInstance.getClass().getMethod("getCommandSystem");
                     commandManager = getCm.invoke(serverInstance);
                 } catch (NoSuchMethodException e) {
                     try {
-                        Method getCm2 = serverInstance.getClass().getMethod("getCommandSystem");
+                        Method getCm2 = serverInstance.getClass().getMethod("getCommandManager");
                         commandManager = getCm2.invoke(serverInstance);
                     } catch (NoSuchMethodException ignored) {}
                 }
@@ -154,11 +154,11 @@ public class ReflectiveCommandDispatcher implements CommandDispatcher {
             if (serverInstance != null) {
                 Object commandManager = null;
                 try {
-                    Method getCm = serverInstance.getClass().getMethod("getCommandManager");
+                    Method getCm = serverInstance.getClass().getMethod("getCommandSystem");
                     commandManager = getCm.invoke(serverInstance);
                 } catch (NoSuchMethodException e) {
                     try {
-                        Method getCm2 = serverInstance.getClass().getMethod("getCommandSystem");
+                        Method getCm2 = serverInstance.getClass().getMethod("getCommandManager");
                         commandManager = getCm2.invoke(serverInstance);
                     } catch (NoSuchMethodException ignored) {}
                 }
@@ -257,12 +257,11 @@ public class ReflectiveCommandDispatcher implements CommandDispatcher {
             // try to get command manager
             Object commandManager = null;
             try {
-                Method getCm = serverClass.getMethod("getCommandManager");
+                Method getCm = serverClass.getMethod("getCommandSystem");
                 commandManager = getCm.invoke(serverInstance);
             } catch (NoSuchMethodException e) {
-                // try alternative
                 try {
-                    Method getCm2 = serverClass.getMethod("getCommandSystem");
+                    Method getCm2 = serverClass.getMethod("getCommandManager");
                     commandManager = getCm2.invoke(serverInstance);
                 } catch (NoSuchMethodException ignored) {
                     logger.info("[ChestCommands] CommandManager accessor not found via known names");
