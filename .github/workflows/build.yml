@@ -22,6 +22,25 @@ jobs:
           java-version: '17'
           cache: 'maven'
 
+      - name: Ensure libs directory and list files
+        run: |
+          echo "Contents of repo:" && ls -la || true
+          echo "Contents of libs:" && ls -la libs || true
+
+      - name: Install local HytaleServer.jar into local Maven repo (if present)
+        run: |
+          if [ -f libs/HytaleServer.jar ]; then
+            echo "Installing libs/HytaleServer.jar into local Maven repository..."
+            mvn org.apache.maven.plugins:maven-install-plugin:3.1.0:install-file \
+              -Dfile=libs/HytaleServer.jar \
+              -DgroupId=com.hypixel \
+              -DartifactId=HytaleServer \
+              -Dversion=local \
+              -Dpackaging=jar
+          else
+            echo "libs/HytaleServer.jar not found - if your project requires it, add it to the libs/ folder.";
+          fi
+
       - name: Build with Maven (package)
         run: mvn -B -DskipTests package
 
