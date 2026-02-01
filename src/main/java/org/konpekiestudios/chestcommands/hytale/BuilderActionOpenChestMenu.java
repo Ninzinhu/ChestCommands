@@ -22,7 +22,8 @@ public class BuilderActionOpenChestMenu extends BuilderActionBase {
 
     @Nullable
     @Override
-    public Action build(BuilderSupport builderSupport) {
+    // Usa Object na assinatura para compatibilidade com a API/JAR
+    public Action build(Object builderSupport) {
         return new OpenChestMenuAction(this);
     }
 
