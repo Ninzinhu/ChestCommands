@@ -1,4 +1,5 @@
 {
+  "Name": "ChestCommands",
   "name": "ChestCommands",
   "version": "1.0.0-pre",
   "main": "org.konpekiestudios.chestcommands.hytale.ChestCommandsPlugin",
