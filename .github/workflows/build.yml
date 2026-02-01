@@ -44,6 +44,22 @@ jobs:
       - name: Build with Maven (package)
         run: mvn -B -DskipTests package
 
+      - name: Create GitHub Release (pre-release) and upload JAR
+        uses: ncipollo/release-action@v1
+        with:
+          tag: pre-release-${{ github.run_id }}
+          name: "Pre-Release ${{ github.run_number }}"
+          body: |
+            Automatic pre-release build
+
+            Commit: ${{ github.sha }}
+            Run: ${{ github.run_id }}
+          files: target/*.jar
+          draft: false
+          prerelease: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Upload JAR artifact
         uses: actions/upload-artifact@v4
         with:
