@@ -64,11 +64,24 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Find packaged JAR
+        id: find_artifact
+        run: |
+          echo "Looking for jar(s) in target/"
+          ART=$(ls target/*.jar 2>/dev/null | head -n 1 || true)
+          if [ -z "$ART" ]; then
+            echo "No JAR found in target/ - failing the step"
+            ls -la target || true
+            exit 1
+          fi
+          echo "Found artifact: $ART"
+          echo "artifact=$ART" >> $GITHUB_OUTPUT
+
       - name: Upload JAR as Release Asset
         uses: actions/upload-release-asset@v1
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: target/*.jar
+          asset_path: ${{ steps.find_artifact.outputs.artifact }}
           asset_name: chestcommands-${{ github.run_number }}.jar
           asset_content_type: application/java-archive
         env:
