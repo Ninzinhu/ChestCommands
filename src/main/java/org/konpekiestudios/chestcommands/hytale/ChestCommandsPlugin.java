@@ -128,6 +128,18 @@ public class ChestCommandsPlugin extends JavaPlugin implements ChestCommandsAPI 
                 }
             }
         }
+        // Registrar comandos dinamicamente após carregar menus
+        for (String key : commandToMenu.keySet()) {
+            try {
+                dispatcher.registerCommand(key, (player, args) -> {
+                    System.out.println("[ChestCommands] Interceptando comando: " + key + " para player: " + player);
+                    handleCommand(player, key);
+                });
+                System.out.println("[ChestCommands] Comando registrado: /" + key);
+            } catch (Exception e) {
+                System.out.println("[ChestCommands] Falha ao registrar comando: /" + key + " - " + e.getMessage());
+            }
+        }
         // Registrar eventos
     }
 
