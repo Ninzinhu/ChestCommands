@@ -6,6 +6,8 @@ import org.konpekiestudios.chestcommands.core.menu.Menu;
 import org.konpekiestudios.chestcommands.core.menu.MenuItem;
 import org.konpekiestudios.chestcommands.api.Action;
 import org.konpekiestudios.chestcommands.api.Condition;
+import org.konpekiestudios.chestcommands.api.ActionContext;
+import org.konpekiestudios.chestcommands.api.PlayerRef;
 import org.yaml.snakeyaml.Yaml;
 
 import java.util.ArrayList;
@@ -45,9 +47,7 @@ public class YamlMenuParser implements MenuParser {
                             String actionType = actionEntry.getKey();
                             String value = (String) actionEntry.getValue();
                             Action action = ActionRegistry.create(actionType, new ActionContext() {
-                                @Override
-                                public org.konpekiestudios.chestcommands.api.PlayerRef getPlayer() { return null; }
-                                @Override
+                                public PlayerRef getPlayer() { return null; }
                                 public String getValue() { return value; }
                             });
                             if (action != null) actions.add(action);
@@ -65,9 +65,7 @@ public class YamlMenuParser implements MenuParser {
                             String conditionType = conditionEntry.getKey();
                             String value = (String) conditionEntry.getValue();
                             Condition condition = ConditionRegistry.create(conditionType, new ActionContext() {
-                                @Override
-                                public org.konpekiestudios.chestcommands.api.PlayerRef getPlayer() { return null; }
-                                @Override
+                                public PlayerRef getPlayer() { return null; }
                                 public String getValue() { return value; }
                             });
                             if (condition != null) conditions.add(condition);

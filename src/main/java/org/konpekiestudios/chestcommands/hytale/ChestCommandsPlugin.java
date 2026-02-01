@@ -4,6 +4,7 @@ import org.konpekiestudios.chestcommands.core.action.ActionRegistry;
 import org.konpekiestudios.chestcommands.core.action.OpenMenuAction;
 import org.konpekiestudios.chestcommands.core.action.GiveItemAction;
 import org.konpekiestudios.chestcommands.core.condition.ConditionRegistry;
+import org.konpekiestudios.chestcommands.core.condition.HasPermissionCondition;
 import org.konpekiestudios.chestcommands.core.service.MenuService;
 import org.konpekiestudios.chestcommands.core.service.MenuLoader;
 import org.konpekiestudios.chestcommands.core.menu.Menu;
@@ -13,6 +14,7 @@ import org.konpekiestudios.chestcommands.api.ChestCommandsAPI;
 
 // Importar classes do Hytale, como Plugin, Server, etc.
 // Assume Player is from Hytale API
+import com.hypixel.hytale.server.api.EntityStore;
 
 public class ChestCommandsPlugin implements ChestCommandsAPI { // implements Plugin ou similar
     private static ChestCommandsPlugin instance;

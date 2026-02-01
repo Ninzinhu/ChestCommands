@@ -3,7 +3,7 @@ package org.konpekiestudios.chestcommands.hytale;
 import org.konpekiestudios.chestcommands.core.menu.Menu;
 import org.konpekiestudios.chestcommands.core.menu.ChestMenu;
 // Importar classes do Hytale, como Player e UI
-import com.hypixel.hytale.api.EntityStore;
+import com.hypixel.hytale.server.api.EntityStore;
 
 public class HytaleMenuRenderer {
     public void open(EntityStore player, Menu menu) { // Use EntityStore for player
