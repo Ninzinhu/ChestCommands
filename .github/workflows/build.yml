@@ -5,7 +5,11 @@ on:
     branches: [ master ]
   pull_request:
     branches: [ master ]
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Optional release tag to use (if empty a pre-release tag will be generated)'
+        required: false
 
 # Grant the workflow permission to create releases and upload assets
 permissions:
@@ -48,12 +52,25 @@ jobs:
       - name: Build with Maven (package)
         run: mvn -B -DskipTests package
 
+      - name: Determine release tag
+        id: set_tag
+        run: |
+          echo "Github event: $GITHUB_EVENT_NAME"
+          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ] && [ -n "${{ github.event.inputs.release_tag }}" ]; then
+            echo "Using provided release_tag: ${{ github.event.inputs.release_tag }}"
+            echo "RELEASE_TAG=${{ github.event.inputs.release_tag }}" >> $GITHUB_ENV
+          else
+            TAG="pre-release-${{ github.run_id }}"
+            echo "No release_tag provided; using generated tag: $TAG"
+            echo "RELEASE_TAG=$TAG" >> $GITHUB_ENV
+          fi
+
       - name: Create GitHub Release (pre-release)
         id: create_release
         uses: actions/create-release@v1
         with:
-          tag_name: pre-release-${{ github.run_id }}
-          release_name: "Pre-Release ${{ github.run_number }}"
+          tag_name: ${{ env.RELEASE_TAG }}
+          release_name: "${{ env.RELEASE_TAG }}"
           body: |
             Automatic pre-release build
 
@@ -82,7 +99,7 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ${{ steps.find_artifact.outputs.artifact }}
-          asset_name: chestcommands-${{ github.run_number }}.jar
+          asset_name: ChestCommands-${{ env.RELEASE_TAG }}.jar
           asset_content_type: application/java-archive
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
