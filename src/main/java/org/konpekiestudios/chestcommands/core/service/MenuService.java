@@ -12,12 +12,10 @@ public class MenuService {
         if (item == null) return;
 
         ActionContext context = new ActionContext() {
-            @Override
             public PlayerRef getPlayer() {
                 return player;
             }
 
-            @Override
             public String getValue() {
                 return ""; // or parse from action
             }
