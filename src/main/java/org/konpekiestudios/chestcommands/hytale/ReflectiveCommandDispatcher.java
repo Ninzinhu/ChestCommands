@@ -310,11 +310,11 @@ public class ReflectiveCommandDispatcher implements CommandDispatcher {
     }
 
     private Object createServerHandlerProxy(Method cmMethod, CommandHandler handler) {
-        // create a dynamic proxy compatible with many handler types: try BiConsumer for player and args
-        return java.lang.reflect.Proxy.newProxyInstance(getClass().getClassLoader(), new Class<?>[]{java.util.function.BiConsumer.class}, (proxy, method, args) -> {
-            if ("accept".equals(method.getName()) && args != null && args.length == 2) {
+        // create a dynamic proxy compatible with many handler types: try Consumer for player
+        return java.lang.reflect.Proxy.newProxyInstance(getClass().getClassLoader(), new Class<?>[]{java.util.function.Consumer.class}, (proxy, method, args) -> {
+            if ("accept".equals(method.getName()) && args != null && args.length == 1) {
                 Object sender = args[0];
-                String[] sargs = args[1] instanceof String[] ? (String[]) args[1] : new String[0];
+                String[] sargs = new String[0];
                 handler.handle(sender, sargs);
             }
             return null;
