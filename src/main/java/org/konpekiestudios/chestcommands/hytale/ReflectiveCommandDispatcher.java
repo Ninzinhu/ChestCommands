@@ -30,10 +30,9 @@ public class ReflectiveCommandDispatcher implements CommandDispatcher {
                 // build a minimal ChestMenu dynamically
                 org.konpekiestudios.chestcommands.core.menu.ChestMenu cm = new org.konpekiestudios.chestcommands.core.menu.ChestMenu("Test Chest UI", 3);
                 renderer.open(sender, cm);
-                return true;
             } catch (Throwable t) {
                 logger.log(Level.WARNING, "Error opening test UI", t);
-                return false;
+                throw t;
             }
         });
     }
