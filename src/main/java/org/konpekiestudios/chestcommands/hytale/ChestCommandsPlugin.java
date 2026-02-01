@@ -219,12 +219,12 @@ public class ChestCommandsPlugin extends JavaPlugin implements ChestCommandsAPI 
                     } catch (NoSuchMethodException nsme3) {
                         // Nenhum método de chat encontrado
                         // Loga no console do servidor
-                        com.hypixel.hytale.server.core.HytaleServer.getLogger().info("[ChestCommands] Nenhum método de chat encontrado em EntityStore para mensagem: " + message);
+                        System.out.println("[ChestCommands] Nenhum método de chat encontrado em EntityStore para mensagem: " + message);
                     }
                 }
             }
         } catch (Exception e) {
-            com.hypixel.hytale.server.core.HytaleServer.getLogger().severe("[ChestCommands] Falha ao enviar mensagem ao chat: " + e.getMessage());
+            System.out.println("[ChestCommands] Falha ao enviar mensagem ao chat: " + e.getMessage());
         }
     }
 
