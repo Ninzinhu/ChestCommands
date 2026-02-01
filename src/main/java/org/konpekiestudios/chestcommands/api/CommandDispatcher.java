@@ -17,4 +17,9 @@ public interface CommandDispatcher {
      * Execute a command as the console; output lines will be sent to the callback.
      */
     void executeAsConsole(String command, Consumer<String> outputLine);
+
+    /**
+     * Register a command handler for dynamic command registration.
+     */
+    void registerCommand(String command, java.util.function.BiConsumer<Object, String[]> handler);
 }

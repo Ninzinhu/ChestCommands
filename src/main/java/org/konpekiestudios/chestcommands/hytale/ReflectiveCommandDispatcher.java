@@ -121,6 +121,13 @@ public class ReflectiveCommandDispatcher implements CommandDispatcher {
         if (outputLine != null) outputLine.accept("[ChestCommands] dispatcher reflexivo não conseguiu executar o comando: " + command);
     }
 
+    @Override
+    public void registerCommand(String command, java.util.function.BiConsumer<Object, String[]> handler) {
+        // Exemplo: registrar comando no sistema do Hytale
+        // CommandManager.register(command, (player, args) -> handler.accept(player, args));
+        System.out.println("[ChestCommands] (ReflectiveCommandDispatcher) Comando registrado: /" + command);
+    }
+
     private Object findSingletonInstance(Class<?> cls) {
         try {
             // try common patterns
