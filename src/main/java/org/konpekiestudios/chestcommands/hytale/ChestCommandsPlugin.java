@@ -56,6 +56,20 @@ public class ChestCommandsPlugin extends JavaPlugin implements ChestCommandsAPI 
 
     @Override
     public void onEnable() {
+        // Cria a pasta ChestCommandsConfig se não existir
+        File configDir = new File("ChestCommandsConfig");
+        System.out.println("ChestCommands: Creating ChestCommandsConfig folder at " + configDir.getAbsolutePath());
+        if (!configDir.exists()) {
+            boolean created = configDir.mkdirs();
+            if (created) {
+                System.out.println("ChestCommands: Folder created successfully.");
+            } else {
+                System.out.println("ChestCommands: Failed to create folder. Please create it manually.");
+            }
+        } else {
+            System.out.println("ChestCommands: Folder already exists.");
+        }
+
         // Inicializar serviços
         renderer = new HytaleMenuRenderer();
         menuService = new MenuService();
