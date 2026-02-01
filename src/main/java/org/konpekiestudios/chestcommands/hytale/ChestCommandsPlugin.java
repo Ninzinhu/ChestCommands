@@ -7,6 +7,7 @@ import org.konpekiestudios.chestcommands.core.condition.ConditionRegistry;
 import org.konpekiestudios.chestcommands.core.service.MenuService;
 import org.konpekiestudios.chestcommands.core.service.MenuLoader;
 import org.konpekiestudios.chestcommands.core.menu.Menu;
+import org.konpekiestudios.chestcommands.core.menu.ChestMenu;
 import org.konpekiestudios.chestcommands.api.ActionContext;
 import org.konpekiestudios.chestcommands.api.ChestCommandsAPI;
 
@@ -24,6 +25,10 @@ public class ChestCommandsPlugin implements ChestCommandsAPI { // implements Plu
     }
 
     public static ChestCommandsAPI getAPI() {
+        return instance;
+    }
+
+    public static ChestCommandsPlugin getInstance() {
         return instance;
     }
 
@@ -70,5 +75,19 @@ public class ChestCommandsPlugin implements ChestCommandsAPI { // implements Plu
     @Override
     public void registerCondition(String id, java.util.function.Function<ActionContext, org.konpekiestudios.chestcommands.api.Condition> factory) {
         ConditionRegistry.register(id, factory);
+    }
+
+    // Novo método para carregar ChestMenu
+    public ChestMenu loadMenu(String menuId) {
+        // Implementar carregamento de YAML para ChestMenu
+        // Por exemplo, usar YamlMenuParser para carregar
+        // Retornar null se não encontrado
+        return null; // Placeholder
+    }
+
+    // Novo método para abrir UI de baú
+    public void openChestUI(EntityStore player, ChestMenu menu) {
+        // Usar renderer para abrir a UI
+        renderer.open(player, menu);
     }
 }
