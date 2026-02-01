@@ -19,6 +19,7 @@ import org.konpekiestudios.chestcommands.registrar.ConfigMenusRegistrar;
 // Assume Player is from Hytale API
 import com.hypixel.hytale.EntityStore;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
+import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 
 import java.io.File;
 import java.util.HashMap;
@@ -37,6 +38,12 @@ public class ChestCommandsPlugin extends JavaPlugin implements ChestCommandsAPI 
 
     public ChestCommandsPlugin() {
         instance = this;
+    }
+
+    // Constructor required by Hytale plugin loader
+    public ChestCommandsPlugin(JavaPluginInit init) {
+        this(); // Call default constructor
+        // Use init if needed for initialization
     }
 
     public static ChestCommandsAPI getAPI() {
