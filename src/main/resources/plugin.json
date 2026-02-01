@@ -2,7 +2,13 @@
   "Name": "ChestCommands",
   "Main": "org.konpekiestudios.chestcommands.hytale.ChestCommandsPlugin",
   "Version": "1.0.0-pre",
-  "Authors": ["Nin"],
+  "Authors": [
+    {
+      "name": "Nin",
+      "email": "joaovevasconcelos@gmail.com",
+      "url": "https://github.com/Ninzinhu"
+    }
+  ],
   "Description": "Plugin de menus configuráveis para Hytale, inspirado no Chest Commands",
   "Website": "https://github.com/Ninzinhu/ChestCommands",
   "Dependencies": []
