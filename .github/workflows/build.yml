@@ -7,6 +7,10 @@ on:
     branches: [ master ]
   workflow_dispatch: {}
 
+# Grant the workflow permission to create releases and upload assets
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -44,19 +48,29 @@ jobs:
       - name: Build with Maven (package)
         run: mvn -B -DskipTests package
 
-      - name: Create GitHub Release (pre-release) and upload JAR
-        uses: ncipollo/release-action@v1
+      - name: Create GitHub Release (pre-release)
+        id: create_release
+        uses: actions/create-release@v1
         with:
-          tag: pre-release-${{ github.run_id }}
-          name: "Pre-Release ${{ github.run_number }}"
+          tag_name: pre-release-${{ github.run_id }}
+          release_name: "Pre-Release ${{ github.run_number }}"
           body: |
             Automatic pre-release build
 
             Commit: ${{ github.sha }}
             Run: ${{ github.run_id }}
-          files: target/*.jar
           draft: false
           prerelease: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload JAR as Release Asset
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: target/*.jar
+          asset_name: chestcommands-${{ github.run_number }}.jar
+          asset_content_type: application/java-archive
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
