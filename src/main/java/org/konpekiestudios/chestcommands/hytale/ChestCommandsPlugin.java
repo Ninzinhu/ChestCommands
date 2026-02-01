@@ -8,15 +8,23 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.konpekiestudios.chestcommands.api.CommandDispatcher;
+import com.hypixel.hytale.server.core.plugin.JavaPlugin;
+import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 
-public class ChestCommandsPlugin {
+public class ChestCommandsPlugin extends JavaPlugin {
     // Use Object for runtime-only types (Hytale classes) to avoid compile-time linkage
     private final Logger logger = Logger.getLogger("ChestCommands");
     private CommandDispatcher commandDispatcher;
     private File configDir;
 
-    public ChestCommandsPlugin() {
-        // kept minimal - Hytale-specific init will be done via onEnableReflection
+    public ChestCommandsPlugin(JavaPluginInit init) {
+        super(init);
+        // kept minimal - Hytale-specific init will be done via onEnableReflection or onEnable
+    }
+
+    @Override
+    public void onEnable() {
+        onEnableReflection(null);
     }
 
     // Called reflectively by our bootstrap when Hytale plugin init is available
