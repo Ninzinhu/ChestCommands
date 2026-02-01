@@ -6,5 +6,7 @@ public abstract class JavaPlugin {
     public void onEnable() {}
     public void onDisable() {}
     public void onLoad() {}
-    // Add other methods as needed based on JAR inspection
+
+    // Default constructor
+    public JavaPlugin() {}
 }
