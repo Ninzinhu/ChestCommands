@@ -1,9 +1,9 @@
 package org.konpekiestudios.chestcommands.hytale;
 
-import com.hypixel.hytale.api.Action;
-import com.hypixel.hytale.api.Role;
-import com.hypixel.hytale.api.Ref;
-import com.hypixel.hytale.api.EntityStore;
+import com.hypixel.hytale.Action;
+import com.hypixel.hytale.Role;
+import com.hypixel.hytale.Ref;
+import com.hypixel.hytale.EntityStore;
 import org.konpekiestudios.chestcommands.core.menu.ChestMenu;
 
 public class OpenChestMenuAction extends Action {

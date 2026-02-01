@@ -1,9 +1,9 @@
 package org.konpekiestudios.chestcommands.hytale;
 
-import com.hypixel.hytale.api.BuilderActionBase;
-import com.hypixel.hytale.api.Action;
-import com.hypixel.hytale.api.BuilderSupport;
-import com.hypixel.hytale.api.BuilderDescriptorState;
+import com.hypixel.hytale.BuilderActionBase;
+import com.hypixel.hytale.Action;
+import com.hypixel.hytale.BuilderSupport;
+import com.hypixel.hytale.BuilderDescriptorState;
 
 import javax.annotation.Nullable;
 

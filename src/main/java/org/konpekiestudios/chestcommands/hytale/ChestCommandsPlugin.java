@@ -14,7 +14,7 @@ import org.konpekiestudios.chestcommands.api.ChestCommandsAPI;
 
 // Importar classes do Hytale, como Plugin, Server, etc.
 // Assume Player is from Hytale API
-import com.hypixel.hytale.api.EntityStore;
+import com.hypixel.hytale.EntityStore;
 
 public class ChestCommandsPlugin implements ChestCommandsAPI { // implements Plugin ou similar
     private static ChestCommandsPlugin instance;
