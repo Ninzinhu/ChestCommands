@@ -37,13 +37,13 @@ public class ChestCommandsPlugin extends JavaPlugin implements ChestCommandsAPI 
     private CommandDispatcher dispatcher;
 
     public ChestCommandsPlugin() {
-        instance = this;
+        this(new JavaPluginInit()); // Call the other constructor with a dummy init
     }
 
     // Constructor required by Hytale plugin loader
     public ChestCommandsPlugin(JavaPluginInit init) {
-        this(); // Call default constructor
-        // Use init if needed for initialization
+        super(init); // Call super with init
+        instance = this;
     }
 
     public static ChestCommandsAPI getAPI() {

@@ -7,6 +7,6 @@ public abstract class JavaPlugin {
     public void onDisable() {}
     public void onLoad() {}
 
-    // Default constructor
-    public JavaPlugin() {}
+    // Constructor that takes JavaPluginInit
+    public JavaPlugin(JavaPluginInit init) {}
 }
