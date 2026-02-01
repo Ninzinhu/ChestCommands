@@ -19,7 +19,13 @@ public interface CommandDispatcher {
     void executeAsConsole(String command, Consumer<String> outputLine);
 
     /**
-     * Register a command handler for dynamic command registration.
+     * Register a command handler for a name (fallback local registration).
+     * Handler accepts (senderObject, args[]) and returns boolean success.
      */
-    void registerCommand(String command, java.util.function.BiConsumer<Object, String[]> handler);
+    void register(String name, org.konpekiestudios.chestcommands.api.CommandHandler handler);
+
+    /**
+     * Dispatch a command (sender: engine-specific player object or console), command label without slash, and args.
+     */
+    boolean dispatch(Object sender, String commandLabel, String[] args);
 }

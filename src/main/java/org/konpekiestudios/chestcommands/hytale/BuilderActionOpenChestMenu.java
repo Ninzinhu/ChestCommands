@@ -1,35 +1,24 @@
 package org.konpekiestudios.chestcommands.hytale;
 
-import com.hypixel.hytale.BuilderActionBase;
 import com.hypixel.hytale.Action;
-import com.hypixel.hytale.BuilderSupport;
-import com.hypixel.hytale.BuilderDescriptorState;
-
-import javax.annotation.Nullable;
+import com.hypixel.hytale.BuilderActionBase;
 
 public class BuilderActionOpenChestMenu extends BuilderActionBase {
-    @Nullable
     @Override
     public String getShortDescription() {
-        return "Opens the chest menu UI";
+        return "Opens the chest UI";
     }
 
-    @Nullable
     @Override
     public String getLongDescription() {
-        return "Opens a configurable chest menu UI for the player, with items and actions";
+        return "Opens a chest-like UI for the player";
     }
 
-    @Nullable
     @Override
-    // Usa Object na assinatura para compatibilidade com a API/JAR
     public Action build(Object builderSupport) {
-        return new OpenChestMenuAction(this);
-    }
-
-    @Nullable
-    @Override
-    public BuilderDescriptorState getBuilderDescriptorState() {
-        return BuilderDescriptorState.Stable;
+        String id = "default";
+        // If builderSupport is not null and has getStateSupport, try to get id
+        // This is a stub, as BuilderSupport is empty
+        return new OpenChestMenuAction(id);
     }
 }

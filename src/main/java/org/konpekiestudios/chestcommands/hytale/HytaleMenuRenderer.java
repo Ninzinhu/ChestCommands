@@ -2,85 +2,122 @@ package org.konpekiestudios.chestcommands.hytale;
 
 import org.konpekiestudios.chestcommands.core.menu.Menu;
 import org.konpekiestudios.chestcommands.core.menu.ChestMenu;
-// Importar classes do Hytale, como Player e UI
-import com.hypixel.hytale.EntityStore;
 
-import java.lang.reflect.Method;
 import java.lang.reflect.Constructor;
-import java.util.Map;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class HytaleMenuRenderer {
-    public void open(EntityStore player, Menu menu) { // Use EntityStore for player
-        // For now, delegate to ChestMenu if possible
-        if (menu instanceof ChestMenu) {
-            open(player, (ChestMenu) menu);
-        } else {
-            // Fallback: send message
-            try {
-                Method sendMessage = player.getClass().getMethod("sendMessage", String.class);
-                sendMessage.invoke(player, "Menu opened: " + menu.getTitle());
-            } catch (Exception e) {
-                // ignore
+    private final Logger logger = Logger.getLogger("ChestCommands");
+
+    private final List<String> candidateWindows = Arrays.asList(
+            "com.hypixel.hytale.server.core.ui.ItemContainerWindow",
+            "com.hypixel.hytale.server.core.ui.window.ItemContainerWindow",
+            "com.hypixel.hytale.server.core.ui.window.Window",
+            "com.hypixel.hytale.server.core.inventory.container.ItemContainer",
+            "com.hypixel.hytale.server.core.ui.ItemContainer"
+    );
+
+    public void open(Object player, Menu menu) {
+        try {
+            if (player == null) {
+                logger.info("[ChestCommands] open called with null player");
+                return;
             }
+
+            // Try to build a simple chest-like container if menu is null
+            if (menu == null) {
+                ChestMenu cm = new ChestMenu("Test Chest", 3);
+                cm.setId("test");
+                cm.setTitle("Test Chest");
+                cm.setRows(3);
+                // pass this to the reflective open below
+                openWindowReflective(player, cm);
+                return;
+            }
+
+            openWindowReflective(player, menu);
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Failed to open menu via reflection", e);
         }
     }
 
-    public void open(EntityStore player, ChestMenu chestMenu) { // Método sobrecarregado para ChestMenu
-        try {
-            // Try to create and open a chest UI using reflection
-            // Assume classes like ItemContainerWindow or Window exist
-            Class<?> windowClass = Class.forName("com.hypixel.hytale.server.core.ui.ItemContainerWindow", false, player.getClass().getClassLoader());
-            Constructor<?> ctor = windowClass.getConstructor(String.class, int.class); // title, rows
-            Object window = ctor.newInstance(chestMenu.getTitle(), chestMenu.getRows());
+    private void openWindowReflective(Object player, Menu menu) throws Exception {
+        Class<?> playerClass = player.getClass();
 
-            // Fill slots
-            Map<Integer, org.konpekiestudios.chestcommands.core.menu.MenuItem> items = chestMenu.getItems();
-            for (Map.Entry<Integer, org.konpekiestudios.chestcommands.core.menu.MenuItem> entry : items.entrySet()) {
-                int slot = entry.getKey();
-                org.konpekiestudios.chestcommands.core.menu.MenuItem item = entry.getValue();
-                // Assume setItem method
-                Method setItem = windowClass.getMethod("setItem", int.class, Object.class); // slot, item
-                // For now, create a dummy item or use reflection to create ItemStack
-                // This is placeholder; real implementation needs Item creation
-                Object dummyItem = createDummyItem(item);
-                setItem.invoke(window, slot, dummyItem);
-            }
-
-            // Open the window for the player
-            Method openUI = player.getClass().getMethod("openUI", windowClass);
-            openUI.invoke(player, window);
-
-        } catch (Exception e) {
-            // Fallback to textual UI
+        for (String fqcn : candidateWindows) {
             try {
-                Method sendMessage = player.getClass().getMethod("sendMessage", String.class);
-                sendMessage.invoke(player, "§cFailed to open UI, using text fallback.");
-                // Call the textual open from ConfigMenuAction
-                // But since we don't have access, send basic info
-                sendMessage.invoke(player, "Menu: " + chestMenu.getTitle());
-                for (Map.Entry<Integer, org.konpekiestudios.chestcommands.core.menu.MenuItem> entry : chestMenu.getItems().entrySet()) {
-                    sendMessage.invoke(player, "Slot " + entry.getKey() + ": " + entry.getValue().getDisplayName());
+                Class<?> windowClass = Class.forName(fqcn);
+                // try constructors: (String title, int rows) or (Menu)
+                Object windowInstance = null;
+                try {
+                    Constructor<?> c = windowClass.getConstructor(String.class, int.class);
+                    windowInstance = c.newInstance(menu.getTitle(), menu.getRows());
+                } catch (NoSuchMethodException ignored) {
+                    try {
+                        Constructor<?> c2 = windowClass.getConstructor(Menu.class);
+                        windowInstance = c2.newInstance(menu);
+                    } catch (NoSuchMethodException ignored2) {
+                        try {
+                            Constructor<?> c3 = windowClass.getConstructor();
+                            windowInstance = c3.newInstance();
+                        } catch (NoSuchMethodException ignored3) {
+                            // cannot instantiate this window class
+                        }
+                    }
                 }
-            } catch (Exception ex) {
-                // ignore
+
+                if (windowInstance == null) continue;
+
+                // try to set items if method exists
+                try {
+                    Method setItem = windowClass.getMethod("setItem", int.class, Object.class);
+                    // leave empty for now
+                } catch (NoSuchMethodException ignored) {
+                    // ok
+                }
+
+                // try player open method variants
+                String[] openNames = new String[]{"openUI", "openWindow", "openInventory", "openContainer", "showWindow"};
+                boolean opened = false;
+                for (String openName : openNames) {
+                    try {
+                        Method open = playerClass.getMethod(openName, windowInstance.getClass());
+                        open.invoke(player, windowInstance);
+                        logger.info("[ChestCommands] Opened window using " + fqcn + " via player method " + openName);
+                        opened = true;
+                        break;
+                    } catch (NoSuchMethodException ignored) {
+                    }
+                }
+
+                if (opened) return;
+
+            } catch (ClassNotFoundException ignored) {
+                // try next fqcn
             }
         }
+
+        throw new IllegalStateException("No candidate window type available to open");
     }
 
-    private Object createDummyItem(org.konpekiestudios.chestcommands.core.menu.MenuItem item) {
-        // Placeholder: try to create an ItemStack or similar
+    public void safeSendMessage(Object player, String message) {
+        if (player == null) return;
         try {
-            Class<?> itemClass = Class.forName("com.hypixel.hytale.server.core.item.ItemStack", false, Thread.currentThread().getContextClassLoader());
-            Constructor<?> ctor = itemClass.getConstructor(String.class, int.class); // material, amount
-            // Assume item has material and amount
-            return ctor.newInstance(item.getIcon(), 1); // placeholder
-        } catch (Exception e) {
-            return null;
+            Method m = player.getClass().getMethod("sendChatMessage", String.class);
+            m.invoke(player, message);
+            return;
+        } catch (Exception ignored) {
         }
-    }
-
-    // Método para mapear slot lógico para slot real
-    public int mapToSlot(int eventSlot) {
-        return eventSlot; // Placeholder
+        try {
+            Method m = player.getClass().getMethod("sendSystemMessage", String.class);
+            m.invoke(player, message);
+            return;
+        } catch (Exception ignored) {
+        }
+        logger.info("[ChestCommands] (fallback) player message: " + message);
     }
 }
