@@ -101,8 +101,14 @@ public class ChestCommandsPlugin extends JavaPlugin implements ChestCommandsAPI 
         String key = command.startsWith("/") ? command.substring(1) : command;
         var menuDef = commandToMenu.get(key);
         if (menuDef != null) {
-            // abrir menu via ConfigMenuAction (adapter deve implementar open(player))
-            new ConfigMenuAction(menuDef, config != null ? config.rows : 5, dispatcher).open(player);
+            // Try to open UI if possible, else fallback to text
+            ChestMenu chestMenu = loadMenu(menuDef.id); // Assume loadMenu returns ChestMenu
+            if (chestMenu != null) {
+                renderer.open((EntityStore) player, chestMenu);
+            } else {
+                // abrir menu via ConfigMenuAction (adapter deve implementar open(player))
+                new ConfigMenuAction(menuDef, config != null ? config.rows : 5, dispatcher).open(player);
+            }
         }
     }
 
@@ -136,10 +142,30 @@ public class ChestCommandsPlugin extends JavaPlugin implements ChestCommandsAPI 
 
     // Novo método para carregar ChestMenu
     public ChestMenu loadMenu(String menuId) {
-        // Implementar carregamento de YAML para ChestMenu
-        // Por exemplo, usar YamlMenuParser para carregar
-        // Retornar null se não encontrado
-        return null; // Placeholder
+        // Load from config
+        if (config != null && config.menus.containsKey(menuId)) {
+            PluginMenuConfig.MenuDef def = config.menus.get(menuId);
+            ChestMenu chestMenu = new ChestMenu(def.title, def.rows != null ? def.rows : 6);
+            if (def.items != null) {
+                for (Map.Entry<String, PluginMenuConfig.ItemDef> entry : def.items.entrySet()) {
+                    try {
+                        int slot = Integer.parseInt(entry.getKey());
+                        PluginMenuConfig.ItemDef itemDef = entry.getValue();
+                        // Create MenuItem
+                        org.konpekiestudios.chestcommands.core.menu.MenuItem item = new org.konpekiestudios.chestcommands.core.menu.MenuItem();
+                        item.setId(itemDef.material); // or id
+                        item.setIcon(itemDef.material);
+                        item.setDisplayName(itemDef.name);
+                        // For now, skip actions and conditions
+                        chestMenu.addItem(slot, item);
+                    } catch (NumberFormatException e) {
+                        // ignore invalid slot
+                    }
+                }
+            }
+            return chestMenu;
+        }
+        return null;
     }
 
     // Novo método para abrir UI de baú
