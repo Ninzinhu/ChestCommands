@@ -1,9 +1,14 @@
 {
+  "Name": "ChestCommands",
   "group": "org.konpekiestudios.chestcommands",
   "name": "ChestCommands",
+  "Version": "2.0.0",
   "version": "2.0.0",
+  "Description": "Hytale ChestCommands Plugin",
   "description": "Hytale ChestCommands Plugin",
+  "Main": "org.konpekiestudios.chestcommands.hytale.ChestCommandsPlugin",
   "main": "org.konpekiestudios.chestcommands.hytale.ChestCommandsPlugin",
+  "Authors": ["Nin"],
   "authors": [
     {
       "name": "Nin",
@@ -11,11 +16,18 @@
       "url": "https://github.com/Ninzinhu"
     }
   ],
+  "Website": "https://github.com/Ninzinhu/ChestCommands",
   "website": "https://github.com/Ninzinhu/ChestCommands",
+  "ServerVersion": ">=0.0.1",
   "serverVersion": ">=0.0.1",
+  "Dependencies": {},
   "dependencies": {},
+  "OptionalDependencies": {},
   "optionalDependencies": {},
+  "LoadBefore": {},
   "loadBefore": {},
+  "DisabledByDefault": false,
   "disabledByDefault": false,
+  "IncludesAssetPack": false,
   "includesAssetPack": false
 }
