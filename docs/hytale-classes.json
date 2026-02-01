@@ -1,0 +1,13 @@
+{
+  "source": "libs/HytaleServer.jar",
+  "count": 8131,
+  "note": "Use tools/find_hytale_class.py to search this index",
+  "example_paths": [
+    "com/hypixel/hytale/LateMain",
+    "com/hypixel/hytale/Main",
+    "com/hypixel/hytale/server/core/asset/HytaleAssetStore",
+    "com/hypixel/hytale/server/core/entity/entities/Player",
+    "com/hypixel/hytale/server/core/entity/entities/player/windows/ContainerWindow",
+    "com/hypixel/hytale/server/core/entity/InteractionManager"
+  ]
+}

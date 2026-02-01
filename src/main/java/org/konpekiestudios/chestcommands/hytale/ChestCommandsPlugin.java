@@ -11,16 +11,25 @@ import org.konpekiestudios.chestcommands.core.menu.Menu;
 import org.konpekiestudios.chestcommands.core.menu.ChestMenu;
 import org.konpekiestudios.chestcommands.api.ActionContext;
 import org.konpekiestudios.chestcommands.api.ChestCommandsAPI;
+import org.konpekiestudios.chestcommands.config.PluginMenuConfig;
+import org.konpekiestudios.chestcommands.registrar.ConfigMenusRegistrar;
 
 // Importar classes do Hytale, como Plugin, Server, etc.
 // Assume Player is from Hytale API
 import com.hypixel.hytale.EntityStore;
+
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ChestCommandsPlugin implements ChestCommandsAPI { // implements Plugin ou similar
     private static ChestCommandsPlugin instance;
     private HytaleMenuRenderer renderer;
     private MenuService menuService;
     private MenuLoader menuLoader;
+
+    private PluginMenuConfig config;
+    private final Map<String, org.konpekiestudios.chestcommands.config.PluginMenuConfig.MenuDef> commandToMenu = new HashMap<>();
 
     public ChestCommandsPlugin() {
         instance = this;
@@ -34,7 +43,7 @@ public class ChestCommandsPlugin implements ChestCommandsAPI { // implements Plu
         return instance;
     }
 
-    public void onEnable() {
+    public void onEnable(File dataFolder, java.util.function.BiConsumer<String, java.util.function.Consumer<Object>> registerCommandFn) {
         // Inicializar serviços
         renderer = new HytaleMenuRenderer();
         menuService = new MenuService();
@@ -46,6 +55,20 @@ public class ChestCommandsPlugin implements ChestCommandsAPI { // implements Plu
             return new GiveItemAction(parts[0], Integer.parseInt(parts[1]));
         });
         ConditionRegistry.register("permission", ctx -> new HasPermissionCondition(ctx.getValue()));
+
+        try {
+            config = PluginMenuConfig.load(dataFolder);
+            ConfigMenusRegistrar.registerAll(config, registerCommandFn);
+            // build a command->menu map for quick lookup
+            for (PluginMenuConfig.MenuDef m : config.menus.values()) {
+                if (m.command != null) {
+                    String key = m.command.startsWith("/") ? m.command.substring(1) : m.command;
+                    commandToMenu.put(key, m);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         // Registrar eventos
     }
 
@@ -53,12 +76,25 @@ public class ChestCommandsPlugin implements ChestCommandsAPI { // implements Plu
         // Limpeza
     }
 
-    // Método para abrir menu
+    // Método chamado pelo adapter Hytale quando um comando registrado é executado
+    public void handleCommand(Object player, String command) {
+        if (command == null) return;
+        String key = command.startsWith("/") ? command.substring(1) : command;
+        var menuDef = commandToMenu.get(key);
+        if (menuDef != null) {
+            // abrir menu via ConfigMenuAction (adapter deve implementar open(player))
+            new ConfigMenuAction(menuDef, config != null ? config.rows : 5).open(player);
+        }
+    }
+
+    // Método para abrir menu - adaptadores Hytale podem usar este método
     public void openMenu(Object player, String menuId) { // Use Object for now, replace with Player
         HytalePlayerRef playerRef = new HytalePlayerRef(player);
         // Load menu and open
-        // Menu menu = loadMenu(menuId);
-        // renderer.open(player, menu);
+        Menu menu = loadMenu(menuId);
+        if (menu != null) {
+            // renderer.open(player, menu);
+        }
     }
 
     @Override
