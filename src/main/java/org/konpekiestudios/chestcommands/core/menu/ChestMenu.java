@@ -3,23 +3,22 @@ package org.konpekiestudios.chestcommands.core.menu;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ChestMenu {
-    private String title;
-    private int rows;
-    private Map<Integer, MenuItem> items; // Itens no baú, indexados por slot
+public class ChestMenu extends Menu {
+    // ChestMenu is a specific Menu type (bau) — reuse fields in Menu
 
     public ChestMenu(String title, int rows) {
-        this.title = title;
-        this.rows = rows;
-        this.items = new HashMap<>();
+        setTitle(title);
+        setRows(rows);
+        setItems(new HashMap<>());
     }
 
     // Métodos para adicionar itens, carregar de YAML, etc.
     public void addItem(int slot, MenuItem item) {
-        items.put(slot, item);
+        getItems().put(slot, item);
     }
 
-    public String getTitle() { return title; }
-    public int getRows() { return rows; }
-    public Map<Integer, MenuItem> getItems() { return items; }
+    // Conveniência: expor getters que delegam à classe base
+    public String getTitle() { return super.getTitle(); }
+    public int getRows() { return super.getRows(); }
+    public Map<Integer, MenuItem> getItems() { return super.getItems(); }
 }
