@@ -2,9 +2,15 @@
   "Name": "ChestCommands",
   "Main": "org.konpekiestudios.chestcommands.hytale.ChestCommandsPlugin",
   "Version": "2.0.0",
-  "Authors": ["Nin"],
+  "Authors": [
+    {
+      "name": "Nin",
+      "email": "joaovevasconcelos@gmail.com",
+      "url": "https://github.com/Ninzinhu"
+    }
+  ],
   "Description": "Hytale ChestCommands Plugin",
   "Website": "https://github.com/Ninzinhu/ChestCommands",
   "ServerVersion": ">=0.0.1",
-  "Dependencies": {}
+  "Dependencies": []
 }
