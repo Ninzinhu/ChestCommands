@@ -1,0 +1,21 @@
+{
+  "group": "org.konpekiestudios.chestcommands",
+  "name": "ChestCommands",
+  "version": "2.0.0",
+  "description": "Hytale ChestCommands Plugin",
+  "main": "org.konpekiestudios.chestcommands.hytale.ChestCommandsPlugin",
+  "authors": [
+    {
+      "name": "Nin",
+      "email": "joaovevasconcelos@gmail.com",
+      "url": "https://github.com/Ninzinhu"
+    }
+  ],
+  "website": "https://github.com/Ninzinhu/ChestCommands",
+  "serverVersion": ">=0.0.1",
+  "dependencies": {},
+  "optionalDependencies": {},
+  "loadBefore": {},
+  "disabledByDefault": false,
+  "includesAssetPack": false
+}
