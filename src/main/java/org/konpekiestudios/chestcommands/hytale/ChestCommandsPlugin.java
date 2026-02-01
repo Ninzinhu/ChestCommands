@@ -85,21 +85,48 @@ public class ChestCommandsPlugin extends JavaPlugin implements ChestCommandsAPI 
         // Use reflective dispatcher
         dispatcher = new ReflectiveCommandDispatcher();
 
-        try {
-            // Assume data folder is current or configurable
-            File dataFolder = new File("."); // Adjust as needed
-            config = PluginMenuConfig.load(dataFolder);
-            // For now, no command registration in onEnable; handle in adapter
-            // ConfigMenusRegistrar.registerAll(config, registerCommandFn, dispatcher);
-            // build a command->menu map for quick lookup
-            for (PluginMenuConfig.MenuDef m : config.menus.values()) {
-                if (m.command != null) {
-                    String key = m.command.startsWith("/") ? m.command.substring(1) : m.command;
-                    commandToMenu.put(key, m);
+        // Carregar todos os menus de arquivos .yml na pasta
+        commandToMenu.clear();
+        config = new PluginMenuConfig();
+        File[] files = configDir.listFiles((dir, name) -> name.endsWith(".yml") || name.endsWith(".yaml"));
+        if (files != null) {
+            for (File file : files) {
+                try (java.io.FileInputStream in = new java.io.FileInputStream(file)) {
+                    org.yaml.snakeyaml.Yaml yaml = new org.yaml.snakeyaml.Yaml();
+                    Map<String, Object> m = yaml.load(in);
+                    PluginMenuConfig.MenuDef md = new PluginMenuConfig.MenuDef();
+                    String menuId = file.getName().replaceFirst("\\.ya?ml$", "");
+                    md.id = menuId;
+                    md.command = asString(m.get("command"));
+                    md.title = asString(m.get("title"));
+                    if (m.get("rows") instanceof Number) md.rows = ((Number) m.get("rows")).intValue();
+                    Object itemsObj = m.get("items");
+                    if (itemsObj instanceof Map) {
+                        Map<String, Object> items = (Map<String, Object>) itemsObj;
+                        for (Map.Entry<String, Object> it : items.entrySet()) {
+                            String slot = it.getKey();
+                            Object iv = it.getValue();
+                            if (!(iv instanceof Map)) continue;
+                            Map<String, Object> im = (Map<String, Object>) iv;
+                            PluginMenuConfig.ItemDef id = new PluginMenuConfig.ItemDef();
+                            id.material = asString(im.get("material"));
+                            id.name = asString(im.get("name"));
+                            Object lore = im.get("lore");
+                            if (lore instanceof java.util.List) id.lore = (java.util.List<String>) lore;
+                            id.action = asString(im.get("action"));
+                            md.items.put(slot, id);
+                        }
+                    }
+                    config.menus.put(menuId, md);
+                    if (md.command != null) {
+                        String key = md.command.startsWith("/") ? md.command.substring(1) : md.command;
+                        commandToMenu.put(key, md);
+                    }
+                    System.out.println("ChestCommands: Loaded menu '" + menuId + "' from " + file.getName());
+                } catch (Exception e) {
+                    System.out.println("ChestCommands: Failed to load menu from " + file.getName() + ": " + e.getMessage());
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
         // Registrar eventos
     }
@@ -111,18 +138,32 @@ public class ChestCommandsPlugin extends JavaPlugin implements ChestCommandsAPI 
 
     // Método chamado pelo adapter Hytale quando um comando registrado é executado
     public void handleCommand(Object player, String command) {
-        if (command == null) return;
+        System.out.println("[ChestCommands] handleCommand chamado para comando: " + command + ", player: " + player);
+        if (command == null) {
+            System.out.println("[ChestCommands] Comando nulo recebido, ignorando.");
+            return;
+        }
         String key = command.startsWith("/") ? command.substring(1) : command;
         var menuDef = commandToMenu.get(key);
         if (menuDef != null) {
+            System.out.println("[ChestCommands] Menu encontrado para comando: " + key + " (menuId: " + menuDef.id + ")");
             // Try to open UI if possible, else fallback to text
             ChestMenu chestMenu = loadMenu(menuDef.id); // Assume loadMenu returns ChestMenu
             if (chestMenu != null) {
-                renderer.open((EntityStore) player, chestMenu);
+                System.out.println("[ChestCommands] ChestMenu carregado com sucesso para menuId: " + menuDef.id);
+                try {
+                    renderer.open((EntityStore) player, chestMenu);
+                    System.out.println("[ChestCommands] renderer.open chamado para player: " + player + ", menu: " + chestMenu.getTitle());
+                } catch (Exception e) {
+                    System.out.println("[ChestCommands] Erro ao tentar abrir o menu via renderer.open: " + e.getMessage());
+                    e.printStackTrace();
+                }
             } else {
-                // abrir menu via ConfigMenuAction (adapter deve implementar open(player))
+                System.out.println("[ChestCommands] ChestMenu nulo para menuId: " + menuDef.id + ", usando fallback textual.");
                 new ConfigMenuAction(menuDef, config != null ? config.rows : 5, dispatcher).open(player);
             }
+        } else {
+            System.out.println("[ChestCommands] Nenhum menu encontrado para comando: " + key + ". Verifique se o arquivo .yml está correto e se o comando está registrado.");
         }
     }
 
@@ -186,5 +227,9 @@ public class ChestCommandsPlugin extends JavaPlugin implements ChestCommandsAPI 
     public void openChestUI(EntityStore player, ChestMenu menu) {
         // Usar renderer para abrir a UI
         renderer.open(player, menu);
+    }
+
+    private static String asString(Object o) {
+        return o == null ? null : String.valueOf(o);
     }
 }
