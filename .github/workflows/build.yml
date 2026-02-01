@@ -50,7 +50,7 @@ jobs:
           fi
 
       - name: Build with Maven (package)
-        run: mvn -B -DskipTests package
+        run: mvn clean package
 
       - name: Determine release tag
         id: set_tag
