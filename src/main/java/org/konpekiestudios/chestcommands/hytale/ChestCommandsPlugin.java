@@ -56,6 +56,7 @@ public class ChestCommandsPlugin extends JavaPlugin implements ChestCommandsAPI 
 
     @Override
     public void onEnable() {
+        System.out.println("[ChestCommands] Plugin onEnable chamado!");
         // Cria a pasta ChestCommandsConfig se não existir
         File configDir = new File("ChestCommandsConfig");
         System.out.println("ChestCommands: Creating ChestCommandsConfig folder at " + configDir.getAbsolutePath());
@@ -132,7 +133,7 @@ public class ChestCommandsPlugin extends JavaPlugin implements ChestCommandsAPI 
         for (String key : commandToMenu.keySet()) {
             try {
                 dispatcher.registerCommand(key, (player, args) -> {
-                    System.out.println("[ChestCommands] Interceptando comando: " + key + " para player: " + player);
+                    sendChat(player, "[ChestCommands] Interceptando comando: " + key + " para player: " + player);
                     handleCommand(player, key);
                 });
                 System.out.println("[ChestCommands] Comando registrado: /" + key);
@@ -140,6 +141,21 @@ public class ChestCommandsPlugin extends JavaPlugin implements ChestCommandsAPI 
                 System.out.println("[ChestCommands] Falha ao registrar comando: /" + key + " - " + e.getMessage());
             }
         }
+        // Teste: registrar comando de debug
+        dispatcher.registerCommand("testchest", (player, args) -> {
+            sendChat(player, "[ChestCommands] Comando /testchest interceptado para player: " + player);
+        });
+        // Registrar comando de teste para abrir baú vazio
+        dispatcher.registerCommand("testchestui", (player, args) -> {
+            sendChat(player, "[ChestCommands] Comando /testchestui interceptado para player: " + player);
+            ChestMenu testMenu = new ChestMenu("Teste Baú", 3); // 3 linhas, vazio
+            try {
+                renderer.open((EntityStore) player, testMenu);
+                sendChat(player, "[ChestCommands] renderer.open chamado para player: " + player + ", menu: " + testMenu.getTitle());
+            } catch (Exception e) {
+                sendChat(player, "[ChestCommands] Erro ao abrir baú de teste: " + e.getMessage());
+            }
+        });
         // Registrar eventos
     }
 
@@ -150,32 +166,65 @@ public class ChestCommandsPlugin extends JavaPlugin implements ChestCommandsAPI 
 
     // Método chamado pelo adapter Hytale quando um comando registrado é executado
     public void handleCommand(Object player, String command) {
-        System.out.println("[ChestCommands] handleCommand chamado para comando: " + command + ", player: " + player);
+        sendChat(player, "[ChestCommands] handleCommand chamado para comando: " + command + ", player: " + player);
         if (command == null) {
-            System.out.println("[ChestCommands] Comando nulo recebido, ignorando.");
+            sendChat(player, "[ChestCommands] Comando nulo recebido, ignorando.");
             return;
         }
         String key = command.startsWith("/") ? command.substring(1) : command;
         var menuDef = commandToMenu.get(key);
         if (menuDef != null) {
-            System.out.println("[ChestCommands] Menu encontrado para comando: " + key + " (menuId: " + menuDef.id + ")");
-            // Try to open UI if possible, else fallback to text
+            sendChat(player, "[ChestCommands] Menu encontrado para comando: " + key + " (menuId: " + menuDef.id + ")");
             ChestMenu chestMenu = loadMenu(menuDef.id); // Assume loadMenu returns ChestMenu
             if (chestMenu != null) {
-                System.out.println("[ChestCommands] ChestMenu carregado com sucesso para menuId: " + menuDef.id);
+                sendChat(player, "[ChestCommands] ChestMenu carregado com sucesso para menuId: " + menuDef.id);
                 try {
                     renderer.open((EntityStore) player, chestMenu);
-                    System.out.println("[ChestCommands] renderer.open chamado para player: " + player + ", menu: " + chestMenu.getTitle());
+                    sendChat(player, "[ChestCommands] renderer.open chamado para player: " + player + ", menu: " + chestMenu.getTitle());
+                    sendChat(player, "[ChestCommands] Menu '" + chestMenu.getTitle() + "' aberto!");
                 } catch (Exception e) {
-                    System.out.println("[ChestCommands] Erro ao tentar abrir o menu via renderer.open: " + e.getMessage());
-                    e.printStackTrace();
+                    sendChat(player, "[ChestCommands] Erro ao abrir menu: " + e.getMessage());
                 }
             } else {
-                System.out.println("[ChestCommands] ChestMenu nulo para menuId: " + menuDef.id + ", usando fallback textual.");
+                sendChat(player, "[ChestCommands] Menu não encontrado ou inválido. Usando fallback textual.");
                 new ConfigMenuAction(menuDef, config != null ? config.rows : 5, dispatcher).open(player);
             }
         } else {
-            System.out.println("[ChestCommands] Nenhum menu encontrado para comando: " + key + ". Verifique se o arquivo .yml está correto e se o comando está registrado.");
+            sendChat(player, "[ChestCommands] Nenhum menu encontrado para comando: " + key + ". Verifique se o arquivo .yml está correto e se o comando está registrado.");
+        }
+    }
+
+    // Envia mensagem ao chat do jogador (Hytale)
+    private void sendChat(Object player, String message) {
+        try {
+            if (player instanceof EntityStore) {
+                boolean sent = false;
+                // Usar método do Server.jar para enviar mensagem ao chat
+                try {
+                    EntityStore.class.getMethod("sendMessage", String.class).invoke(player, message);
+                    sent = true;
+                } catch (NoSuchMethodException nsme) {
+                    try {
+                        EntityStore.class.getMethod("sendChatMessage", String.class).invoke(player, message);
+                        sent = true;
+                    } catch (NoSuchMethodException nsme2) {
+                        // Nenhum método encontrado
+                    }
+                }
+                if (!sent) {
+                    // Tenta fallback via API do servidor
+                    try {
+                        EntityStore.class.getMethod("sendSystemMessage", String.class).invoke(player, message);
+                        sent = true;
+                    } catch (NoSuchMethodException nsme3) {
+                        // Nenhum método de chat encontrado
+                        // Loga no console do servidor
+                        com.hypixel.hytale.server.core.HytaleServer.getLogger().info("[ChestCommands] Nenhum método de chat encontrado em EntityStore para mensagem: " + message);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            com.hypixel.hytale.server.core.HytaleServer.getLogger().severe("[ChestCommands] Falha ao enviar mensagem ao chat: " + e.getMessage());
         }
     }
 
