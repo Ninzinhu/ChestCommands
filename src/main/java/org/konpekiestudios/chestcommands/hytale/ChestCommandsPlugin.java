@@ -11,18 +11,20 @@ import org.konpekiestudios.chestcommands.core.menu.Menu;
 import org.konpekiestudios.chestcommands.core.menu.ChestMenu;
 import org.konpekiestudios.chestcommands.api.ActionContext;
 import org.konpekiestudios.chestcommands.api.ChestCommandsAPI;
+import org.konpekiestudios.chestcommands.api.CommandDispatcher;
 import org.konpekiestudios.chestcommands.config.PluginMenuConfig;
 import org.konpekiestudios.chestcommands.registrar.ConfigMenusRegistrar;
 
 // Importar classes do Hytale, como Plugin, Server, etc.
 // Assume Player is from Hytale API
 import com.hypixel.hytale.EntityStore;
+import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ChestCommandsPlugin implements ChestCommandsAPI { // implements Plugin ou similar
+public class ChestCommandsPlugin extends JavaPlugin implements ChestCommandsAPI { // implements Plugin ou similar
     private static ChestCommandsPlugin instance;
     private HytaleMenuRenderer renderer;
     private MenuService menuService;
@@ -30,6 +32,8 @@ public class ChestCommandsPlugin implements ChestCommandsAPI { // implements Plu
 
     private PluginMenuConfig config;
     private final Map<String, org.konpekiestudios.chestcommands.config.PluginMenuConfig.MenuDef> commandToMenu = new HashMap<>();
+
+    private CommandDispatcher dispatcher;
 
     public ChestCommandsPlugin() {
         instance = this;
@@ -43,7 +47,8 @@ public class ChestCommandsPlugin implements ChestCommandsAPI { // implements Plu
         return instance;
     }
 
-    public void onEnable(File dataFolder, java.util.function.BiConsumer<String, java.util.function.Consumer<Object>> registerCommandFn) {
+    @Override
+    public void onEnable() {
         // Inicializar serviços
         renderer = new HytaleMenuRenderer();
         menuService = new MenuService();
@@ -56,9 +61,15 @@ public class ChestCommandsPlugin implements ChestCommandsAPI { // implements Plu
         });
         ConditionRegistry.register("permission", ctx -> new HasPermissionCondition(ctx.getValue()));
 
+        // Use reflective dispatcher
+        dispatcher = new ReflectiveCommandDispatcher();
+
         try {
+            // Assume data folder is current or configurable
+            File dataFolder = new File("."); // Adjust as needed
             config = PluginMenuConfig.load(dataFolder);
-            ConfigMenusRegistrar.registerAll(config, registerCommandFn);
+            // For now, no command registration in onEnable; handle in adapter
+            // ConfigMenusRegistrar.registerAll(config, registerCommandFn, dispatcher);
             // build a command->menu map for quick lookup
             for (PluginMenuConfig.MenuDef m : config.menus.values()) {
                 if (m.command != null) {
@@ -72,6 +83,7 @@ public class ChestCommandsPlugin implements ChestCommandsAPI { // implements Plu
         // Registrar eventos
     }
 
+    @Override
     public void onDisable() {
         // Limpeza
     }
@@ -83,7 +95,7 @@ public class ChestCommandsPlugin implements ChestCommandsAPI { // implements Plu
         var menuDef = commandToMenu.get(key);
         if (menuDef != null) {
             // abrir menu via ConfigMenuAction (adapter deve implementar open(player))
-            new ConfigMenuAction(menuDef, config != null ? config.rows : 5).open(player);
+            new ConfigMenuAction(menuDef, config != null ? config.rows : 5, dispatcher).open(player);
         }
     }
 
