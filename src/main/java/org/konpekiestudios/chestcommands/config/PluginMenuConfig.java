@@ -14,6 +14,7 @@ public class PluginMenuConfig {
     public Map<String, MenuDef> menus = new HashMap<>();
 
     public static class MenuDef {
+        public String id;
         public String command;
         public String title;
         public Integer rows;
@@ -54,6 +55,7 @@ public class PluginMenuConfig {
                     if (!(val instanceof Map)) continue;
                     Map<String, Object> m = (Map<String, Object>) val;
                     MenuDef md = new MenuDef();
+                    md.id = key;
                     md.command = asString(m.get("command"));
                     md.title = asString(m.get("title"));
                     if (m.get("rows") instanceof Number) md.rows = ((Number) m.get("rows")).intValue();
