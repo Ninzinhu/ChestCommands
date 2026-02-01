@@ -1,9 +1,9 @@
 {
   "Name": "ChestCommands",
-  "name": "ChestCommands",
-  "version": "1.0.0-pre",
-  "main": "org.konpekiestudios.chestcommands.hytale.ChestCommandsPlugin",
-  "description": "Plugin de menus configuráveis para Hytale, inspirado no Chest Commands",
-  "authors": ["Konpeki Studios"],
-  "dependencies": []
+  "Main": "org.konpekiestudios.chestcommands.hytale.ChestCommandsPlugin",
+  "Version": "1.0.0-pre",
+  "Authors": ["Nin"],
+  "Description": "Plugin de menus configuráveis para Hytale, inspirado no Chest Commands",
+  "Website": "https://github.com/Ninzinhu/ChestCommands",
+  "Dependencies": []
 }
