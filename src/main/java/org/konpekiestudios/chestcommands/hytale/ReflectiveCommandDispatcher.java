@@ -24,17 +24,28 @@ public class ReflectiveCommandDispatcher implements CommandDispatcher {
         // register built-in test command
         register("testchestui", (sender, args) -> {
             try {
-                // Use logger instead of message send to avoid visibility/reflection issues in constructor
-                logger.info("[ChestCommands] testchestui invoked; attempting to open test UI...");
-                HytaleMenuRenderer renderer = new HytaleMenuRenderer();
-                // build a minimal ChestMenu dynamically
-                org.konpekiestudios.chestcommands.core.menu.ChestMenu cm = new org.konpekiestudios.chestcommands.core.menu.ChestMenu("Test Chest UI", 3);
-                renderer.open(sender, cm);
+                logger.info("[ChestCommands] testchestui invoked for sender: " + sender);
+                if (sender != null) {
+                    // Try to open the UI
+                    HytaleMenuRenderer renderer = new HytaleMenuRenderer();
+                    org.konpekiestudios.chestcommands.core.menu.ChestMenu cm = new org.konpekiestudios.chestcommands.core.menu.ChestMenu("Test Chest UI", 3);
+                    renderer.open(sender, cm);
+                    // If no exception, UI opened successfully
+                }
             } catch (Throwable t) {
-                logger.log(Level.WARNING, "Error opening test UI", t);
-                throw t;
+                logger.log(Level.WARNING, "Error opening UI: " + t.getMessage(), t);
+                if (sender != null) {
+                    try {
+                        Method m = sender.getClass().getMethod("sendChatMessage", String.class);
+                        m.invoke(sender, "Failed to open chest UI: " + t.getMessage());
+                    } catch (Exception e) {
+                        logger.info("[ChestCommands] Could not send error message to player: " + e.getMessage());
+                    }
+                }
             }
         });
+
+        // Removed money command, as per user request
     }
 
     private void rendererLog(Object player, String msg) {

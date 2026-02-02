@@ -1,0 +1,86 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - '*'
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Pull LFS files
+      run: git lfs pull
+
+    - name: Cache Maven packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+        restore-keys: ${{ runner.os }}-m2
+
+    - name: Set up JDK 25
+      uses: actions/setup-java@v4
+      with:
+        java-version: '25'
+        distribution: 'temurin'
+        cache: maven
+
+    - name: Display environment info
+      run: |
+        echo "Java version:"
+        java -version
+        echo "Maven version:"
+        mvn -version
+        echo "Tag: ${{ github.ref_name }}"
+
+    - name: Validate POM
+      run: mvn validate
+
+    - name: Set version to tag name
+      if: startsWith(github.ref, 'refs/tags/')
+      run: mvn versions:set -DnewVersion=${{ github.ref_name }}
+
+    - name: Compile project
+      run: mvn compile
+
+    - name: Run tests
+      run: mvn test
+
+    - name: Package JAR
+      run: mvn -B package --file pom.xml
+
+    - name: List target directory
+      run: ls -la target/
+
+    - name: Generate release notes
+      if: startsWith(github.ref, 'refs/tags/')
+      run: |
+        echo "## Changes" > release_notes.md
+        git log -1 --oneline | sed 's/^/- /' >> release_notes.md
+        echo "" >> release_notes.md
+        echo "## Contributors" >> release_notes.md
+        git log -1 --format='%aN' | sort -u | sed 's/^/- /' >> release_notes.md
+
+    - name: Create release
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: softprops/action-gh-release@v2
+      with:
+        files: target/konpeki-economy-${{ github.ref_name }}.jar
+        draft: false
+        prerelease: ${{ contains(github.ref_name, 'Pre-Release') }}
+        body_path: release_notes.md
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
