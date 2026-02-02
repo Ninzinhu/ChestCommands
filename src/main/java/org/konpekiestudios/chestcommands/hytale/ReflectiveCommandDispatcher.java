@@ -7,6 +7,7 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -45,7 +46,24 @@ public class ReflectiveCommandDispatcher implements CommandDispatcher {
             }
         });
 
-        // Removed money command, as per user request
+        // register coins command like in economy plugin
+        register("coins", (sender, args) -> {
+            try {
+                logger.info("[ChestCommands] coins invoked for sender: " + sender);
+                if (sender != null) {
+                    // Show money like in economy plugin
+                    try {
+                        Method m = sender.getClass().getMethod("sendChatMessage", String.class);
+                        m.invoke(sender, "Your coins: 1000 coins");
+                    } catch (Exception e) {
+                        logger.info("[ChestCommands] Could not send message to player: " + e.getMessage());
+                    }
+                }
+            } catch (Throwable t) {
+                logger.log(Level.WARNING, "Error in coins", t);
+                throw t;
+            }
+        });
     }
 
     private void rendererLog(Object player, String msg) {
@@ -320,11 +338,12 @@ public class ReflectiveCommandDispatcher implements CommandDispatcher {
     }
 
     private Object createServerHandlerProxy(Method cmMethod, CommandHandler handler) {
-        // create a dynamic proxy compatible with many handler types: try Consumer for player
-        return java.lang.reflect.Proxy.newProxyInstance(getClass().getClassLoader(), new Class<?>[]{java.util.function.Consumer.class}, (proxy, method, args) -> {
-            if ("accept".equals(method.getName()) && args != null && args.length == 1) {
+        // create a dynamic proxy compatible with many handler types: try BiConsumer for player and command
+        return java.lang.reflect.Proxy.newProxyInstance(getClass().getClassLoader(), new Class<?>[]{BiConsumer.class}, (proxy, method, args) -> {
+            if ("accept".equals(method.getName()) && args != null && args.length == 2) {
                 Object sender = args[0];
-                String[] sargs = new String[0];
+                String commandLine = (String) args[1];
+                String[] sargs = commandLine.trim().isEmpty() ? new String[0] : commandLine.split("\\s+");
                 handler.handle(sender, sargs);
             }
             return null;
