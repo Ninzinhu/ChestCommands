@@ -3,7 +3,8 @@
   "Name": "ChestCommands",
   "Version": "1.0.0-pre",
   "Description": "Plugin de menus configuráveis para Hytale, inspirado no Chest Commands",
-  "Main": "org.konpekiestudios.chestcommands.hytale.ChestCommandsPlugin",
+  "Main": "org.konpekiestudios.konpekistudios.hytale.plugins.ChestCommandsPlugin",
+  "Commands": ["testchestui", "coins"],
   "Authors": [
     {
       "Name": "Nin",

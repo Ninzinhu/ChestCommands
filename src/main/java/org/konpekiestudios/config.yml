@@ -1,0 +1,12 @@
+ Configurações do plugin ChestCommands
+# Mensagens do chat e outras configurações
+
+messages:
+  command_not_found: "Comando não encontrado."
+  ui_open_success: "UI do baú aberta com sucesso."
+  ui_open_failed: "Falha ao abrir a UI do baú: {error}"
+  coins_display: "Suas moedas: {amount} moedas"
+  no_permission: "Você não tem permissão para executar este comando."
+
+# Outras configurações
+debug: false
