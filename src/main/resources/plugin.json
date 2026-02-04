@@ -1,5 +1,5 @@
 {
-  "Group": "org.konpekiestudios.konpekistudios",
+  "Group": "org.konpekiestudios.konpekistudios.hytale.plugins",
   "Name": "ChestCommands",
   "Version": "1.0.0-pre",
   "Description": "Plugin de menus configuráveis para Hytale, inspirado no Chest Commands",
