@@ -32,13 +32,11 @@
     </repositories>
 
     <dependencies>
-        <!-- Hytale API (local JAR) -->
+        <!-- Hytale API (from Maven repo) -->
         <dependency>
             <groupId>com.hypixel.hytale</groupId>
             <artifactId>HytaleServer</artifactId>
-            <version>local</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/libs/HytaleServer.jar</systemPath>
+            <version>1.0.0-pre</version>
         </dependency>
         <!-- SnakeYAML para parsing de YAML -->
         <dependency>
