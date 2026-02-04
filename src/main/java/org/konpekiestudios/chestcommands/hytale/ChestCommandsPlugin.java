@@ -36,16 +36,32 @@ public class ChestCommandsPlugin extends JavaPlugin {
         });
 
         logger.info("[ChestCommands] /say command registered!");
+
+        // Comando hello-word
+        dispatcher.register("hello-word", (sender, args) -> {
+            try {
+                logger.info("[ChestCommands] /hello-word invoked for sender: " + sender);
+                if (sender != null) {
+                    Method m = sender.getClass().getMethod("sendChatMessage", String.class);
+                    m.invoke(sender, "Hello, Hytale World!");
+                }
+            } catch (Throwable t) {
+                logger.log(Level.WARNING, "Error in /hello-word: " + t.getMessage(), t);
+            }
+        });
+
+        logger.info("[ChestCommands] /hello-word command registered!");
     }
 
     private void ensureConfigFolder() {
         try {
-            File base = new File("ChestCommandsConfig");
-            if (!base.exists()) {
-                boolean created = base.mkdirs();
-                logger.info("[ChestCommands] Created config folder: " + base.getAbsolutePath() + " -> " + created);
+            // Cria a pasta de config na raiz de onde o jar for executado
+            File pluginFolder = new File("ChestCommandsConfig");
+            if (!pluginFolder.exists()) {
+                boolean created = pluginFolder.mkdirs();
+                logger.info("[ChestCommands] Created config folder: " + pluginFolder.getAbsolutePath() + " -> " + created);
             } else {
-                logger.info("[ChestCommands] Config folder already exists: " + base.getAbsolutePath());
+                logger.info("[ChestCommands] Config folder already exists: " + pluginFolder.getAbsolutePath());
             }
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Could not create/read config folder", e);
