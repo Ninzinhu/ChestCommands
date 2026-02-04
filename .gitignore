@@ -40,3 +40,5 @@ build/
 
 ### Hytale extracted files ###
 libs/HytaleServerExtracted/
+hytale_entries.txt
+HytaleServerContents.txt
