@@ -1,7 +1,7 @@
 package org.konpekiestudios.chestcommands.registrar;
 
 import org.konpekiestudios.chestcommands.config.PluginMenuConfig;
-import org.konpekiestudios.chestcommands.hytale.ConfigMenuAction;
+import org.konpekiestudios.konpekistudios.hytale.plugins.ConfigMenuAction;
 import org.konpekiestudios.chestcommands.api.CommandDispatcher;
 
 import java.util.function.BiConsumer;
