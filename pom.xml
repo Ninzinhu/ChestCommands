@@ -71,7 +71,7 @@
                             <transformers>
                                 <!-- Preserve/create MANIFEST with Main-Class if needed -->
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>org.konpekiestudios.konpekistudios.hytale.ChestCommandsPlugin</mainClass>
+                                    <mainClass>org.konpekiestudios.chestcommands.hytale.ChestCommandsPlugin</mainClass>
                                 </transformer>
                             </transformers>
                             <!-- avoid creating dependency-reduced-pom to keep packaging stable -->
